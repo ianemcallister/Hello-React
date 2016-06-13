@@ -1,3 +1,41 @@
+//presentation component -- doesn't maintain state
+var GreeterMessage = React.createClass({
+	render: function() {
+		var name = this.props.name;
+		var message = this.props.message;
+
+		return (
+			<div>
+				<h1>Hello {name}!</h1>
+				<p>{message}</p>
+			</div>
+		);
+	}
+});
+
+var GreeterForm = React.createClass({
+	onFormSubmit: function(e) {
+		e.preventDefault();
+
+		var name = this.refs.name.value;
+
+		if (name.length > 0) {
+			this.refs.name.value = '';
+			this.props.onNewName(name);
+		}
+	},
+	render: function() {
+		return (
+			<form onSubmit={this.onFormSubmit}>
+				<input type='text' ref='name'/>
+				<button>Set Name</button>
+			</form>			
+		);
+
+	}
+});
+
+//container component -- does maintain state and renders children
 var Greeter = React.createClass({
 	getDefaultProps: function() {
 		return {
@@ -10,19 +48,10 @@ var Greeter = React.createClass({
 			name: this.props.name
 		};
 	},
-	onButtonClick: function(e) {
-		e.preventDefault();
-
-		var nameRef = this.refs.name;
-		var name = nameRef.value;
-		nameRef.value = '';
-
-		if(typeof name === 'string' && name.length > 0) {
-			this.setState({
-				name: name
-			});
-		}
-
+	handleNewName: function(name) {
+		this.setState({
+			name: name
+		});
 	},
 	render: function() {
 		var name = this.state.name;
@@ -30,19 +59,17 @@ var Greeter = React.createClass({
 
 		return (
 			<div>
-				<h1>Hello {name}!</h1>
-				<p>{message}</p>
 
-				<form onSubmit={this.onButtonClick}>
-					<input type='text' ref='name'/>
-					<button>Set Name</button>
-				</form>
+				<GreeterMessage name={name} message={message}/>
+
+				<GreeterForm onNewName={this.handleNewName}/>
+
 			</div>
 		);
 	}
 });
 
-var firstName = 'Edward';
+var firstName = 'Ian';
 
 ReactDOM.render(
 	<Greeter name={firstName} />,
